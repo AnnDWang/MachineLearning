@@ -160,3 +160,29 @@ def loss_func(X,W,b,y):
 #回归问题和分类问题的区别仅仅在于设定的目标值的类型不同。分类设定的目标值是离散的，意义是类别，而回归设定的目标值是连续的，意义是某种数值。
 #线性回归又叫做多项式回归，和逻辑分类类似，都是模型以线性函数描述数据的内在表达式
 #简单滴说，线性回归及时y=w*x+b，即在x的数据平面图上找一条线，尽量拟合所有数据点。
+
+titanic.estimator.logistic_regression()
+titanic.cross_val_accuracy_score()
+
+titanic.estimator.decision_tree_classifier(criterion='entropy')
+#grid search寻找最优决策树
+param_grid=dict(max_depth=range(3,10))
+best_score_,best_params_=titanic.grid_search_common_clf(param_grid,cv=10,scoring='accuracy')
+
+titanic.estimator.decision_tree_classifier(criterion='entopy',**best_params_)
+titanic.cross_val_accuracy_score()
+
+#依赖python的pydot和graphviz包
+from sklearn import tree
+import pydot
+from sklearn.externals.six import StringIO
+
+#为了方便，这里限制决策树的深度观察
+titanic.estimator.decision_tree_classifier(criterion='entropy',max_depth=3)
+clf=titanic.fit()
+
+#存储树plot
+dotfile=StringIO()
+tree.export_graphviz(clf,out_file=dotfile,feature_names=titanic.df.cokumns[1:])
+pydot.graph_from_dot_data(dotfile.getvalue()).write_png("dtree2.png")
+open("dtree2.png")
