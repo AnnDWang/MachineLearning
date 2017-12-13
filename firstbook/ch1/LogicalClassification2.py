@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 #1.4小节 逻辑分类2：线性分类模型
 import numpy as np
 

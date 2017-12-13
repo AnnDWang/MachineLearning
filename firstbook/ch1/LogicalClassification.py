@@ -41,7 +41,8 @@ scores=np.vstack([x,np.ones_like(x),0.2*np.ones_like(x)])
 #np.vstakc()解释见http://blog.csdn.net/csdn15698845876/article/details/73380803
 #np.ones_like()返回一个用1填充的跟输入形状和类型一致的数组
 plt.plot(x,softmax(scores).T,linewidth=2)#？？？？
-#图像没有显示？？？为什么？？？
+
+plt.show()#显示图像
 
 #将分数扩大、缩小100倍
 
