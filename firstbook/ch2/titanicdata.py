@@ -5,11 +5,15 @@ import pandas as pd #pandas是python的数据格式处理类库
 data_train=pd.read_csv("../data/titanic/train.csv")
 data_train.info()
 
+print data_train.info()
+
 data_train.groupby('Survived').count()
+
+print data_train.groupby('Survived').count()
 
 data_train.head(3)
 
-print(data_train.head(3))
+print data_train.head(3)
 
 #数据缺失处理的方法：
 #扔掉缺失数据
@@ -18,17 +22,21 @@ print(data_train.head(3))
 
 #均值填充缺失数据
 def set_missing_ages(p_df):
-    p_df.loc[(p_df.Age.isnull(),'Age')]=p_df.Age.dropna().mean()
+    p_df.loc[(p_df.Age.isnull()),'Age']=p_df.Age.dropna().mean()
     return p_df
+
 
 df=set_missing_ages(data_train)
 
 #归一化数据
 import sklearn.preprocessing as preprocessing
 
-scaler=preprocessing.StandardScaler()
-df['Age_scaled']=scaler.fit_transform(data_train['Age'])
-df['Fare_scaled']=scaler.fit_transform(data_train['Fare'])
+
+import sklearn.preprocessing as preprocessing
+
+scaler = preprocessing.StandardScaler()
+df['Age_scaled'] = scaler.fit_transform(data_train['Age'].values.reshape(-1, 1))
+df['Fare_scaled'] = scaler.fit_transform(data_train['Fare'].values.reshape(-1, 1))
 
 #归一化有问题，git没有加载出源码，之后处理
 
@@ -64,12 +72,12 @@ print(train_df.head(1))
 #输入模型查看成绩
 from abupy import AbuML
 
-train_np=train_df.as_matrix()
-y=train_np[:,0]
-x=train_np[:,1:]
-titanic=AbuML(x,y,train_df)
+train_np = train_df.as_matrix()
+y = train_np[:, 0]
+x = train_np[:, 1:]
+titanic = AbuML(x, y, train_df)
 
-titanic.estimator.logistic_regression()
+titanic.estimator.logistic_classifier()
 titanic.cross_val_accuracy_score()
 
 #逻辑分类是一个线性模型，线性模型就是把特征对应的分类结果的作用相加起来
@@ -81,19 +89,20 @@ titanic.cross_val_accuracy_score()
 #将数值是否在区间内作为特征。高次方让数值内在的表达变得复杂，可描述能力增强，而离散则是让模型来拟合逼近真实的关系描述。
 
 #划分区间
-df['Child']=(data_train['Age']<=10).astype(int)
-#平方
-df['Age*Age']=data_train['Age']*data_train['Age']
-#归一化
-df['Age*Age_scaled']=scaler.fit_transform(df['Age*Age'])
+# 划分区间
+df['Child'] = (data_train['Age'] <= 10).astype(int)
+# 平方
+df['Age*Age'] = data_train['Age'] * data_train['Age']
+# 归一化
+df['Age*Age_scaled'] = scaler.fit_transform(df['Age*Age'].values.reshape(-1, 1))
 
 
-df['Age*Class']=data_train['Age']*data_train['Pclass']
-#归一化
-df['Age*Class_scaled']=scaler.fit_transform(df['Age*Class'])
+df['Age*Class'] = data_train['Age'] * data_train['Pclass']
+# 归一化
+df['Age*Class_scaled'] = scaler.fit_transform(df['Age*Class'].values.reshape(-1, 1))
 
-#filter加入新增特征
-train_df=df.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*\|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*|Child|Age\*Class_.*')
+# filter加入新增的特征
+train_df = df.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*|Child|Age\*Class_.*')
 train_df.head(1)
 
 #新增的特征是否能够提升模型表现
@@ -102,16 +111,15 @@ y=train_np[:,0]
 x=train_np[:,1:]
 titanic=AbuML(x,y,train_df)
 
-titanic.estimator.logistic_regression()
+titanic.estimator.logistic_classifier()
 titanic.cross_val_accuracy_score()
 
 
 #一般来说，机器学习中看一个新特征是否发挥作用，最常用的方法就是加进去看模型成绩是否提升，可以同时观察模型给特征分配的权重，看特征发挥作用的大小。
-titanic.importances_coef_pd()
-
+print titanic.importances_coef_pd()
 #对一些特定的应用场景中，模型的训练非常耗时，可能几天甚至更长，这些应用场景中，需要一些新的数学方法估计新特征是否有效。机器学习中有很多方法评估特征在模型中发挥的作用
 #如：
-titanic.feature_selection()
+print titanic.feature_selection()
 
 #通过人工构造的非线性特征，可以弥补线性模型表达能力的不足，这一手段之所以能生效，背后的原因是：低维的非线性关系可以在高维空间线性展开。
 #增加新的特征维度，让分类任务背后的数学表达式变得更加简单，让分类模型更容易挖掘出信息，这是构造新特征有意义的地方，增加特征维度，构造出模型表达不出的内在表达式。
@@ -162,28 +170,14 @@ def loss_func(X,W,b,y):
 #线性回归又叫做多项式回归，和逻辑分类类似，都是模型以线性函数描述数据的内在表达式
 #简单滴说，线性回归及时y=w*x+b，即在x的数据平面图上找一条线，尽量拟合所有数据点。
 
-titanic.estimator.logistic_regression()
-titanic.cross_val_accuracy_score()
+# Titanic处理好的数据集
+titanic = AbuML.create_test_more_fiter()
 
-titanic.estimator.decision_tree_classifier(criterion='entropy')
-#grid search寻找最优决策树
-param_grid=dict(max_depth=range(3,10))
-best_score_,best_params_=titanic.grid_search_common_clf(param_grid,cv=10,scoring='accuracy')
+# 使用逻辑分类
+titanic.estimator.logistic_classifier()
+from abupy import ABuMLGrid
+# 定义参数搜索范围
+_, best_params = ABuMLGrid.grid_search_init_kwargs(titanic.estimator.clf, titanic.x, titanic.y,
+                                    param_name='C', param_range=[0.001, 0.01, 0.1, 1, 10, 100, 1000], show=True)
+print best_params
 
-titanic.estimator.decision_tree_classifier(criterion='entopy',**best_params_)
-titanic.cross_val_accuracy_score()
-
-#依赖python的pydot和graphviz包
-from sklearn import tree
-import pydot
-from sklearn.externals.six import StringIO
-
-#为了方便，这里限制决策树的深度观察
-titanic.estimator.decision_tree_classifier(criterion='entropy',max_depth=3)
-clf=titanic.fit()
-
-#存储树plot
-dotfile=StringIO()
-tree.export_graphviz(clf,out_file=dotfile,feature_names=titanic.df.cokumns[1:])
-pydot.graph_from_dot_data(dotfile.getvalue()).write_png("dtree2.png")
-open("dtree2.png")
