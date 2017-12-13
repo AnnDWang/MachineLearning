@@ -2,7 +2,7 @@
 #代码来自于《机器学习之路》
 import numpy as np # numpy:快速操作结构数组的工具
 import pandas as pd # pandas:数据分析处理工具
-import matplotlib.pyplot as lpt #matplotlib画图工具
+#import matplotlib.pyplot as lpt #matplotlib画图工具
 from sklearn import datasets # datasets :sklearn 的示例数据集
 
 # 数据集 0-setosa、1-versicolor、2-virginica
@@ -14,13 +14,13 @@ iris = pd.DataFrame(
 )
 
 # 观察数据格式
-iris.head(2)
+print iris.head(2)
 
 # 检查数据是否有缺失
-iris.isnull().sum()
+print iris.isnull().sum()
 
 # 观察样本中按类别数量是否比较均衡
-iris.groupby('y').count()
+print iris.groupby('y').count()
 
 # 选择全部特征训练模型
 X = iris[scikit_iris.feature_names]
@@ -33,7 +33,7 @@ knn=KNeighborsClassifier(n_neighbors=1)
 # 第二步，fit X，y
 knn.fit(X,y)
 # 第三步，predict新数据
-knn.predict([[3,2,2,5]])
+print knn.predict([[3,2,2,5]])
 
 
 # 分割训练集和测试集
