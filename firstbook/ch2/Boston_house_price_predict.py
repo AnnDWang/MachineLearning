@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 from sklearn import datasets
 from sklearn.cross_validation import  train_test_split
 from sklearn.preprocessing import StandardScaler

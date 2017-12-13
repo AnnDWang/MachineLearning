@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 #信息熵函数
 import numpy as np
 def entropy(P):
