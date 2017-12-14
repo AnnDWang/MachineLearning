@@ -181,3 +181,4 @@ _, best_params = ABuMLGrid.grid_search_init_kwargs(titanic.estimator.clf, titani
                                     param_name='C', param_range=[0.001, 0.01, 0.1, 1, 10, 100, 1000], show=True)
 print best_params
 
+
