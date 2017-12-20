@@ -353,3 +353,43 @@ def feature_selection(estimator,x,y):
 
 feature_selection(estimator,train_x,train_y_classification)
 
+# 3.3
+from abupy import AbuML
+# 通过X ，Y矩阵和特征的DataFrame对象醉成AbuML
+ml=AbuML(train_x,train_y_classification,fairy_tale_feature)
+# 使用随机森林作为分类器
+_=ml.estimator.random_forest_classifier()
+
+# 交织验证结果的正确率
+ml.cross_val_accuracy_score()
+# 特征的选择
+ml.feature_selection()
+
+abupy.env.g_enable_ml_feature=True
+abupy.env.g_enable_train_test_split=True
+
+# 初始化资金200万元
+read_cash=2000000
+# 每笔交易的买入基数资金设置为万分之15
+abupy.beta.atr.g_atr_pos_base=0.0015
+
+# 使用run_loop_back运行策略进行全市场回测：
+from abupy import AbuFactorBuyBreak
+from abupy import AbuFactorAtrNStop
+from abupy import AbuFactorPreAtrNStop
+from abupy import AbuFactorCloseAtrNStop
+from abupy import abu
+# 设置选股因子，None为不适用选股因子
+stock_pickers=None
+# 买入因子使用向上突破因子
+buy_factors=[{'xd':60,'class':AbuFactorBuyBreak},{'xd':42,'class':AbuFactorBuyBreak}]
+
+#卖出因子
+sell_factores=[{'stop_loss_n':1.0,'stop_win_n':3.0,'class':AbuFactorAtrNStop},
+               {'class':AbuFactorPreAtrNStop,'pre_atr_n':1.5},
+               {'class':AbuFactorCloseAtrNStop,'close_atr_n':1.5}]
+
+# 全市场
+choise_symbols=None
+# 使用run_loop_back运行策略，5年历史数据回测
+abu_result_tuple,kl_pd_manger=abu.run_loop_back(read_cash.,buy_factors,sell_factores,stock_pickers,choice_symbols=choise_symbols,n_folds=5)
