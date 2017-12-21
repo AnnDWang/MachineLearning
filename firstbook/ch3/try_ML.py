@@ -392,4 +392,61 @@ sell_factores=[{'stop_loss_n':1.0,'stop_win_n':3.0,'class':AbuFactorAtrNStop},
 # 全市场
 choise_symbols=None
 # 使用run_loop_back运行策略，5年历史数据回测
-abu_result_tuple,kl_pd_manger=abu.run_loop_back(read_cash.,buy_factors,sell_factores,stock_pickers,choice_symbols=choise_symbols,n_folds=5)
+abu_result_tuple,kl_pd_manger=abu.run_loop_back(read_cash,buy_factors,sell_factores,stock_pickers,choice_symbols=choise_symbols,n_folds=5)
+
+from abupy import AbuMetricsBase
+
+metrics=AbuMetricsBase(*abu_result_tuple)
+metrics.fit_metrics()
+metrics.plot_returns_cmp(only_show_returns=True)
+
+abupy.evn.g_enable_train_test_split=False
+
+#使用刚才切割股票池中的测试集symbols
+abupy.env.g_enable_last_split_test=True
+read_cash=2000000
+abupy.beta.attr.g_atr_pos_base=0.015
+choice_symbols=None
+abu_result_tuple_test,_=abu.run_loop_back(read_cash,buy_factors,sell_factores,stock_pickers,choice_symbols=choise_symbols,n_folds=5)
+
+metrics=AbuMetricsBase(*abu_result_tuple_test)
+metrics.fit_metrics()
+metrics.plot_returns_cmp(only_show_returns=True)
+
+abu_result_tuple.orders_pd.columns
+
+#使用几个综合特征来训练模型
+from abupy import  AbuUmpMainMul
+
+mul=AbuUmpMainMul.UmpMulFiter(orders_pd=abu_result_tuple.orders_pd,scaler=False)
+
+mul.df.head()
+
+mul().cross_val_accuracy_score()
+
+# 随机森林
+mul().estimator.random_forest_classifier()
+mul().cross_val_accuracy_score()
+
+#使用历史拟合角度特征实验
+from abupy import AbuUmpMainDeg
+deg=AbuUmpMainDeg.UmpDegFilter(orders_pd=abu_result_tuple.orders_pd)
+# 分类器使用adaboost
+deg().estimator.adaboost_classifier()
+deg.df.head()
+
+deg().cross_val_accuracy_score()
+
+# 混淆矩阵分布
+deg().train_test_split_xy()
+
+#使用更多特征
+from abupy import  AbuUmpMainFull
+full=AbuUmpMainFull.UmpFullFilter(orders_pd=abu_result_tuple.orders_pd)
+#继续使用adaboost
+full().estimator.adaboost_classifier()
+#查看full所有特征名称
+full.df.columns
+
+#full交叉验证
+full().cross_val_accuracy_score()
