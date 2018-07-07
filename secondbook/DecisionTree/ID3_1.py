@@ -2,6 +2,7 @@
 import numpy as np
 
 # ID3 基于信息增益
+# 西瓜书第74页
 
 def getInformationEntropy(dataset):
     labels = {}
@@ -99,8 +100,8 @@ def ID3(dataset):
                     ID3(cur_split_feature_dataset)
                 # 不继续循环
                 break;
-            print('递归结束')
-            return '递归结束'
+        print('递归结束')
+        return '递归结束'
 
 
 
