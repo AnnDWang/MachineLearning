@@ -1,0 +1,15 @@
+对率回归
+LDA 线性判别分析
+决策树 ID3 C4.5 CART决策树 多变量决策树 增量学习的决策树
+BP神经网络
+RBF径向基函数网络
+ART自适应谐振理论网络
+SOM自组织映射网络
+级联相关网络
+Elman网络
+Boltzmann机 受限Boltzmann机
+深度学习 CNN DBN
+
+
+
+ 
