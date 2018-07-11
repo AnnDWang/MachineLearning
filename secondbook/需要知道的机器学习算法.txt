@@ -9,6 +9,10 @@ SOM自组织映射网络
 Elman网络
 Boltzmann机 受限Boltzmann机
 深度学习 CNN DBN
+朴素贝叶斯分类器 拉普拉丝修正
+半朴素贝叶斯分类器
+
+
 
 
 
