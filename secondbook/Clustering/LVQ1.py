@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import numpy as np
 
-# k-means聚类
+# lvq 学习向量量化聚类
 # 自己按照书上的方法实现的lvq 学习向量量化
 # 但是停止条件没有去判断均值向量的更新，而是选择了一定的迭代次数
 
@@ -71,5 +71,47 @@ dataSet = [
 # 特征值列表
 labels = ['密度', '含糖率']
 
-def lvq(dataset,k,itera_nums):
-    return 0
+def lvq(dataset,k,itera_nums,learnrate):
+    # k为聚类的数目
+    m, n = np.shape(dataset)
+    # n为样本特征数目
+
+    # 创建k个随机向量作为原型向量
+    mean_dots = {}
+    for i in range(0, k):
+        temp = np.random.random((1, n))
+        mean_dots[i] = temp[0]
+    # 确定聚类中心以后，判断每个元素所属的簇
+    for itera_num in range(0, itera_nums):
+        print('当前迭代次数为：' + str(itera_num))
+        # 创建k个簇
+        classes_dic = {}
+        for k in mean_dots:
+            classes_dic[k] = []
+        for data in dataset:
+            # 计算每个值距离初始中心点的距离
+            temp_distance_dict = []
+            for j in mean_dots:
+                dots = mean_dots[j]
+                distance = np.sqrt(
+                    (data[0] - dots[0]) * (data[0] - dots[0]) + (data[1] - dots[1]) * (data[1] - dots[1]))
+                temp_distance_dict.append((distance, j))
+            temp_distance_dict.sort()
+            # 所属的分类为
+            label = temp_distance_dict[0][1]
+            # 当前数据的实际分类为
+            real_label=data[2]
+            print('第' + str(label) + '个簇当前旧的中心点为' + str(mean_dots[label]))
+            if label==real_label:
+                # 更新原型向量
+                mean_dots[label]=mean_dots[label]+learnrate*(data-mean_dots[label])
+            else:
+                # 更新原型向量
+                mean_dots[label] = mean_dots[label] - learnrate * (data - mean_dots[label])
+            print('第' + str(label) + '个簇当前新的中心点为' + str(mean_dots[label]))
+
+        return mean_dots
+
+prototype_vectors=lvq(dataSet,3,10,0.1)
+
+print('最后的原型向量为' + str(prototype_vectors))
